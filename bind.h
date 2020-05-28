@@ -22,7 +22,7 @@ namespace wstd
 												template <typename ... args>											\
 												static auto get_value(std::_Ph<__index> &, args ... params)				\
 												{																		\
-													static std::tuple<args...> tu_(params ...);							\
+													std::tuple<args...> tu_(params ...);							\
 													return std::get<__index - 1>(tu_);									\
 												}																		\
 											};
