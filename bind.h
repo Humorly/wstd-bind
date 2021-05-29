@@ -212,7 +212,7 @@ namespace wstd
 		template<typename ... args>
 		auto operator ()(args ... params)
 		{
-			this->call(params ...);
+			return this->call(params ...);
 		}
 	};
 };
