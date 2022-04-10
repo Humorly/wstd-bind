@@ -3,6 +3,14 @@
 #include <tuple>
 #include <functional>
 
+// #define placeholder type
+#if defined(_MSC_VER)
+#define __placeholder_type std::_Ph
+
+#elif defined(__GNUC__)
+#define __placeholder_type std::_Placeholder
+#endif	
+
 namespace wstd
 {
 	template <typename __place_type>
@@ -17,10 +25,10 @@ namespace wstd
 
 	// placeholders special
 #define place_holder_wrapper(__index) 		template <>																	\
-											struct params_wrapper<std::_Ph<__index> &>										\
+											struct params_wrapper<__placeholder_type<__index> &>										\
 											{																			\
 												template <typename ... args>											\
-												static auto get_value(std::_Ph<__index> &, args ... params)				\
+												static auto get_value(__placeholder_type<__index> &, args ... params)				\
 												{																		\
 													std::tuple<args...> tu_(params ...);							\
 													return std::get<__index - 1>(tu_);									\
@@ -90,14 +98,14 @@ namespace wstd
 		virtual ~binder() {}
 
 		// call
-		template <typename ... args>
-		auto call(args ... params)
+		template <typename ... __call_args>
+		auto call(__call_args ... params)
 		{
 			return func(args_seq_, params ...);
 		};
 
-		template <std::size_t ... I, typename ... args>
-		auto func(std::index_sequence<I ...>, args ... params)
+		template <std::size_t ... I, typename ... __func_args>
+		auto func(std::index_sequence<I ...>, __func_args ... params)
 		{
 			return function_(params_wrapper< decltype(std::get<I>(tuple_)) >::template get_value(std::get<I>(tuple_), params ...) ...);
 		}
@@ -120,14 +128,14 @@ namespace wstd
 		virtual ~binder_t() {}
 
 		// call
-		template <typename ... args>
-		auto call(args ... params)
+		template <typename ... __call_args>
+		auto call(__call_args ... params)
 		{
 			return func(args_seq_, params ...);
 		};
 
-		template <std::size_t... I, typename ... args>
-		auto func(std::index_sequence<I...>, args ... params)
+		template <std::size_t... I, typename ... __func_args>
+		auto func(std::index_sequence<I...>, __func_args ... params)
 		{
 			return (ob_->*function_)(params_wrapper< decltype(std::get<I>(tuple_)) >::template get_value(std::get<I>(tuple_), params ...)...);
 		}
@@ -174,7 +182,6 @@ namespace wstd
 	class func_impl<ret (args...)>
 	{
 	public:
-		typedef typename ret ret_type;
 
 		func_impl() {}
 		virtual ~func_impl() 
